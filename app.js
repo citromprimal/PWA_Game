@@ -67,7 +67,7 @@ window.addEventListener("keydown", (event) => {
     }
 });
 
-// Gyroscope Controls for Mobile
+// - Gyroscope Controls for Mobile
 window.addEventListener("deviceorientation", (event) => {
     const { beta, gamma } = event;
 
