@@ -38,12 +38,15 @@ header {
 }
 
 .player {
-    background-color: #f00;
+    background-image: url('images/player.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 @media (min-width: 600px) {
     #maze {
-        grid-template-columns: repeat(10, 50px); /* Larger cells on desktop */
+        grid-template-columns: repeat(10, 50px);
         width: 500px;
         height: 500px;
     }
