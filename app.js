@@ -157,3 +157,38 @@ function initializeGame() {
 
 // Call the initialize function on page load
 window.onload = initializeGame;
+
+let startTime = Date.now();
+let deaths = 0;
+let collectibles = 0;
+
+function updateTimer() {
+    const elapsedTime = Date.now() - startTime;
+    const minutes = Math.floor(elapsedTime / 60000);
+    const seconds = Math.floor((elapsedTime % 60000) / 1000);
+    document.getElementById("timer").innerText =
+        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function incrementDeaths() {
+    deaths += 1;
+    document.getElementById("deaths").innerText = deaths;
+}
+
+function incrementCollectibles() {
+    collectibles += 1;
+    document.getElementById("collectibles").innerText = collectibles;
+}
+
+setInterval(updateTimer, 1000); // Updates timer every second
+
+function restartGame() {
+    startTime = Date.now();
+    deaths = 0;
+    collectibles = 0;
+    document.getElementById("deaths").innerText = deaths;
+    document.getElementById("collectibles").innerText = collectibles;
+    document.getElementById("timer").innerText = "00:00";
+    playerPosition = { x: 0, y: 0 };
+    movePlayer(0,0)
+}

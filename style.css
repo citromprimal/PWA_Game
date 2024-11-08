@@ -1,4 +1,3 @@
-/* - Reset basic styling - */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -7,10 +6,28 @@
 
 body {
     font-family: Arial, sans-serif;
+    color: #333;
+    background-color: #f0f0f0;
+    margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #f0f0f0;
+    justify-content: center;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
 
 header {
@@ -20,21 +37,33 @@ header {
 
 #maze {
     display: grid;
-    gap: 2px;
-    grid-template-columns: repeat(10, 30px); /* 10x10 grid */
-    width: 300px;
-    height: 300px;
-    background-color: #333;
+    grid-template-columns: repeat(10, 1fr); /* 10 columns that fill available width */
+    grid-template-rows: repeat(10, 1fr);    /* 10 rows that fill available height */
+    gap: 2px; /* Space between cells */
+    background-color: #444;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .cell {
-    width: 100%;
-    height: 100%;
-    background-color: #eee;
+    width: 40px;
+    height: 40px;
+    background-color: #f8f9fa;
 }
 
 .wall {
-    background-color: #333;
+    background-color: #343a40;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.6);
+}
+
+#maze-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(120deg, #e0e0e0, #f9f9f9);
+    padding: 20px;
+    border-radius: 10px;
+
 }
 
 .player {
@@ -44,10 +73,27 @@ header {
     background-position: center;
 }
 
-@media (min-width: 600px) {
+#info-bar div {
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+.info-item {
+    margin: 0 15px;
+}
+
+@media (max-width: 768px) {
     #maze {
-        grid-template-columns: repeat(10, 50px);
-        width: 500px;
-        height: 500px;
+        grid-template-columns: repeat(10, 1fr); /* Smaller cells for mobile */
+    }
+
+    .cell {
+        width: 30px;
+        height: 30px;
+    }
+
+    #info-bar div {
+        font-size: 0.9em;
+        font-weight: bold;
     }
 }
