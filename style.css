@@ -73,6 +73,34 @@ header {
     background-position: center;
 }
 
+.enemy {
+    background-image: url('images/enemy.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.exit {
+    background-image: url('images/exit.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.collectible {
+    background-image: url('images/collectible.png');
+    background-size: 60%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.key {
+    background-image: url('images/key.png');
+    background-size: 60%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 #info-bar div {
     font-size: 1.25em;
     font-weight: bold;

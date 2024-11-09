@@ -1,0 +1,41 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "description": "Collect all stars, avoid the enemy, and reach the exit.",
+      "maze": [
+        ["player", "wall", "", "", "", "", "", "", "", ""],
+        ["", "wall", "", "wall", "wall", "", "wall", "", "wall", ""],
+        ["", "wall", "", "wall", "", "", "wall", "", "wall", ""],
+        ["", "wall", "", "wall", "", "wall", "collectible", "", "wall", ""],
+        ["", "", "", "wall", "", "", "wall", "", "wall", "collectible"],
+        ["", "wall", "wall", "wall", "wall", "collectible", "wall", "", "", "wall"],
+        ["", "wall", "collectible", "", "", "wall", "collectible", "wall", "", "wall"],
+        ["", "wall", "wall", "wall", "", "wall", "", "", "", "wall"],
+        ["", "", "", "wall", "", "wall", "wall", "wall", "", "exit"],
+        ["wall", "wall", "", "", "", "", "", "", "wall", "wall"]
+      ],
+      "hint": "Find the path to the exit.",
+      "solution": "Move carefully around the enemy to reach the exit."
+    },
+    {
+      "id": 2,
+      "description": "Collect all stars, avoid the enemy, and reach the exit.",
+      "maze": [
+        ["player", "wall", "wall", "", "", "", "", "", "", ""],
+        ["", "collectible", "", "", "", "", "", "wall", "wall", ""],
+        ["wall", "", "", "wall", "", "", "wall", "", "collectible", ""],
+        ["wall", "", "wall", "wall", "wall", "", "wall", "wall", "wall", ""],
+        ["", "wall", "wall", "", "", "", "collectible", "", "", "wall"],
+        ["", "", "key", "", "wall", "", "", "", "", "wall"],
+        ["wall", "wall", "", "collectible", "wall", "", "wall", "", "", ""],
+        ["", "", "", "wall", "", "", "wall", "", "", "wall"],
+        ["wall", "wall", "", "", "", "", "", "wall", "collectible", "wall"],
+        ["", "", "wall", "", "", "", "", "", "", "exit"]
+      ],
+      "hint": "Avoid the moving enemy and gather all stars before heading to the exit.",
+      "solution": "Move carefully around the enemy to reach the exit."
+    }
+  ]
+}
+
