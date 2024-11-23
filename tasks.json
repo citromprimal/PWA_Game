@@ -2,36 +2,142 @@
   "tasks": [
     {
       "id": 1,
-      "description": "Collect all stars, avoid the enemy, and reach the exit.",
+      "difficulty": "Easy",
       "maze": [
-        ["player", "wall", "", "", "", "", "", "", "", ""],
+        ["player", "wall", "", "wall", "trap", "", "", "", "", ""],
         ["", "wall", "", "wall", "wall", "", "wall", "", "wall", ""],
-        ["", "wall", "", "wall", "", "", "wall", "", "wall", ""],
-        ["", "wall", "", "wall", "", "wall", "collectible", "", "wall", ""],
-        ["", "", "", "wall", "", "", "wall", "", "wall", "collectible"],
+        ["", "wall", "", "", "", "", "wall", "", "wall", "collectible"],
+        ["", "wall", "", "wall", "", "wall", "collectible", "", "wall", "trap"],
+        ["", "", "", "wall", "", "", "wall", "", "wall", "wall"],
         ["", "wall", "wall", "wall", "wall", "collectible", "wall", "", "", "wall"],
-        ["", "wall", "collectible", "", "", "wall", "collectible", "wall", "", "wall"],
+        ["", "wall", "trap", "collectible", "", "wall", "collectible", "wall", "", "wall"],
         ["", "wall", "wall", "wall", "", "wall", "", "", "", "wall"],
         ["", "", "", "wall", "", "wall", "wall", "wall", "", "exit"],
-        ["wall", "wall", "", "", "", "", "", "", "wall", "wall"]
+        ["wall", "wall", "", "", "", "trap", "wall", "wall", "wall", "wall"]
       ],
       "hint": "Find the path to the exit.",
       "solution": "Move carefully around the enemy to reach the exit."
     },
     {
       "id": 2,
-      "description": "Collect all stars, avoid the enemy, and reach the exit.",
+      "difficulty": "Medium",
       "maze": [
-        ["player", "wall", "wall", "", "", "", "", "", "", ""],
-        ["", "collectible", "", "", "", "", "", "wall", "wall", ""],
-        ["wall", "", "", "wall", "", "", "wall", "", "collectible", ""],
-        ["wall", "", "wall", "wall", "wall", "", "wall", "wall", "wall", ""],
-        ["", "wall", "wall", "", "", "", "collectible", "", "", "wall"],
-        ["", "", "key", "", "wall", "", "", "", "", "wall"],
-        ["wall", "wall", "", "collectible", "wall", "", "wall", "", "", ""],
-        ["", "", "", "wall", "", "", "wall", "", "", "wall"],
-        ["wall", "wall", "", "", "", "", "", "wall", "collectible", "wall"],
-        ["", "", "wall", "", "", "", "", "", "", "exit"]
+        ["exit", "", "", "", "", "wall", "wall", "wall", "collectible", ""],
+        ["wall", "wall", "collectible", "wall", "", "", "", "", "wall", ""],
+        ["player", "", "wall", "", "wall", "wall", "wall", "", "", ""],
+        ["wall", "", "", "", "wall", "enemy", "wall", "", "wall", ""],
+        ["", "", "wall", "", "", "", "wall", "wall", "", ""],
+        ["collectible", "wall", "", "", "wall", "", "", "wall", "", "wall"],
+        ["wall", "", "wall", "", "", "wall", "", "", "", "wall"],
+        ["", "", "", "wall", "", "wall", "", "wall", "", ""],
+        ["", "wall", "", "wall", "wall", "key", "", "", "wall", ""],
+        ["collectible", "wall", "", "", "", "", "wall", "wall", "collectible", ""]
+      ],
+      "enemies": [
+        {
+          "path": [
+            { "x": 5, "y": 3 },
+            { "x": 5, "y": 4 },
+            { "x": 5, "y": 5 },
+            { "x": 6, "y": 5 },
+            { "x": 6, "y": 6 },
+            { "x": 6, "y": 7 },
+            { "x": 6, "y": 8 },
+            { "x": 7, "y": 8 }
+          ]
+        }
+      ],
+      "hint": "Avoid the moving enemy and gather all stars before heading to the exit.",
+      "solution": "Move carefully around the enemy to reach the exit."
+    },
+    {
+      "id": 3,
+      "difficulty": "Hard",
+      "maze": [
+        ["wall", "collectible", "wall", "wall", "wall", "wall", "wall", "wall", "wall", "wall"],
+        ["wall", "enemy", "", "", "", "", "", "", "enemy", "player"],
+        ["wall", "", "wall", "wall", "wall", "wall", "wall", "wall", "", "wall"],
+        ["wall", "", "wall", "exit", "wall", "collectible", "wall", "trap", "", "wall"],
+        ["wall", "", "wall", "", "wall", "", "", "", "", "wall"],
+        ["wall", "", "wall", "", "trap", "wall", "wall", "wall", "", "wall"],
+        ["wall", "", "", "", "", "collectible", "wall", "key", "", "wall"],
+        ["wall", "", "wall", "wall", "wall", "wall", "wall", "wall", "", "wall"],
+        ["collectible", "enemy", "", "", "", "", "", "", "enemy", "wall"],
+        ["wall", "wall", "wall", "wall", "wall", "wall", "wall", "wall", "collectible", "wall"]
+      ],
+      "enemies": [
+        {
+          "path": [
+            { "x": 1, "y": 1 },
+            { "x": 2, "y": 1 },
+            { "x": 3, "y": 1 },
+            { "x": 4, "y": 1 },
+            { "x": 5, "y": 1 },
+            { "x": 6, "y": 1 },
+            { "x": 7, "y": 1 },
+            { "x": 8, "y": 1 },
+            { "x": 8, "y": 2 },
+            { "x": 8, "y": 3 },
+            { "x": 8, "y": 4 },
+            { "x": 8, "y": 5 },
+            { "x": 8, "y": 6 },
+            { "x": 8, "y": 7 }
+          ]
+        },
+        {
+          "path": [
+            { "x": 8, "y": 1 },
+            { "x": 8, "y": 2 },
+            { "x": 8, "y": 3 },
+            { "x": 8, "y": 4 },
+            { "x": 8, "y": 5 },
+            { "x": 8, "y": 6 },
+            { "x": 8, "y": 7 },
+            { "x": 8, "y": 8 },
+            { "x": 7, "y": 8 },
+            { "x": 6, "y": 8 },
+            { "x": 5, "y": 8 },
+            { "x": 4, "y": 8 },
+            { "x": 3, "y": 8 },
+            { "x": 2, "y": 8 }
+          ]
+        },
+        {
+          "path": [
+            { "x": 1, "y": 8 },
+            { "x": 1, "y": 7 },
+            { "x": 1, "y": 6 },
+            { "x": 1, "y": 5 },
+            { "x": 1, "y": 4 },
+            { "x": 1, "y": 3 },
+            { "x": 1, "y": 2 },
+            { "x": 1, "y": 1 },
+            { "x": 2, "y": 1 },
+            { "x": 3, "y": 1 },
+            { "x": 4, "y": 1 },
+            { "x": 5, "y": 1 },
+            { "x": 6, "y": 1 },
+            { "x": 7, "y": 1 }
+          ]
+        },
+        {
+          "path": [
+            { "x": 8, "y": 8 },
+            { "x": 7, "y": 8 },
+            { "x": 6, "y": 8 },
+            { "x": 5, "y": 8 },
+            { "x": 4, "y": 8 },
+            { "x": 3, "y": 8 },
+            { "x": 2, "y": 8 },
+            { "x": 1, "y": 8 },
+            { "x": 1, "y": 7 },
+            { "x": 1, "y": 6 },
+            { "x": 1, "y": 5 },
+            { "x": 1, "y": 4 },
+            { "x": 1, "y": 3 },
+            { "x": 1, "y": 2 }
+          ]
+        }
       ],
       "hint": "Avoid the moving enemy and gather all stars before heading to the exit.",
       "solution": "Move carefully around the enemy to reach the exit."

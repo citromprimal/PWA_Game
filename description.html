@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maze Runner</title>
     <link rel="icon" href="images/player.png" type="image/png">
-    <link rel ="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body class="bg-light d-flex flex-column align-items-center py-4">
 
@@ -38,31 +37,57 @@
 
 <header class="jumbotron jumbotron-fluid text-center">
     <div class="container">
-        <h1 class="display-4">Maze Runner</h1>
-        <p class="lead">Navigate through the maze!</p>
+        <h1 class="display-4">Game Rules and Instructions</h1>
     </div>
 </header>
 
 <br>
 
-<div class="container text-center">
-
-    <div id="info-bar" class="d-flex justify-content-around bg-dark text-white py-2 rounded mb-3">
-        <div><i class="bi bi-clock"></i> Time: <span id="timer">00:00</span></div>
-        <div><i class="bi bi-x-circle"></i> Deaths: <span id="deaths">0</span></div>
-        <div><i class="bi bi-star-fill"></i> Collectibles: <span id="collectibles">0</span></div>
-        <div><i class="bi bi-key-fill"></i> Keys: <span id="keys">0</span></div>
-    </div>
-
-    <div id="maze-container" class="mb-3">
-        <div id="maze"></div>
-    </div>
-
-    <button onclick="restartGame()" class="btn btn-primary btn-lg">
-        <i class="bi bi-arrow-clockwise"></i> Restart Game
-    </button>
-
-</div>
+<main>
+    <section class="rule">
+        <img src="images/player.png" alt="Player Icon" class="icon">
+        <div>
+            <h2>Player</h2>
+            <p>Use the arrow keys, WASD or click with your mouse (one tile at a time) to move the player around the maze.
+            If you're on mobile, tilt your device in the direction you wish to go in.</p>
+        </div>
+    </section>
+    <section class="rule">
+        <img src="images/key.png" alt="Key Icon" class="icon">
+        <div>
+            <h2>Keys</h2>
+            <p>Collect all the keys to unlock the exit.</p>
+        </div>
+    </section>
+    <section class="rule">
+        <img src="images/collectible.png" alt="Collectible Icon" class="icon">
+        <div>
+            <h2>Collectibles</h2>
+            <p>Collect as many collectibles as you can for bonus points.</p>
+        </div>
+    </section>
+    <section class="rule">
+        <img src="images/exit.png" alt="Exit Icon" class="icon">
+        <div>
+            <h2>Exit</h2>
+            <p>Reach the exit after collecting all keys to complete the level.</p>
+        </div>
+    </section>
+    <section class="rule">
+        <img src="images/enemy.png" alt="Enemy Icon" class="icon">
+        <div>
+            <h2>Enemies</h2>
+            <p>Avoid enemies as they will cause you to lose a life.</p>
+        </div>
+    </section>
+    <section class="rule">
+        <img src="images/trap.png" alt="Trap Icon" class="icon">
+        <div>
+            <h2>Traps</h2>
+            <p>Watch out for traps that can hinder your progress.</p>
+        </div>
+    </section>
+</main>
 
 <br>
 
@@ -73,6 +98,5 @@
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script src="app.js"></script>
 </body>
 </html>

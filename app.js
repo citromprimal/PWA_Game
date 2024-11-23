@@ -1,14 +1,15 @@
 // ----- Constants and Variables -----
 const mazeSize = 10; // 10x10 grid
-let playerPosition = { x: 0, y: 0 }; // Starting position
-let enemyPosition = { x: 0, y: 0 }; // Enemy starting position
+let playerStart = { x: 0, y: 0 }; // Player starting position
+let playerPosition = { x: 0, y: 0 }; // Player position
+let enemyPosition = { x: 0, y: 0 }; // Enemy position
 let exitPosition = { x: 0, y: 0 }; // Exit position
 let collectibleCount = 0; // Number of collectibles in the maze
 let keyCount = 0; // Number of keys in the maze
 let enemyInterval = null; // Interval ID for enemy movement
 let isGameActive = false; // Game starts inactive
 let isTimerRunning = false; // Controls the timer's activity
-
+let enemies = []; // Store multiple enemies
 
 // Game state variables
 let startTime = null; // Will be set when the game starts
@@ -69,7 +70,12 @@ function getNextTask() {
     if (availableTasks.length === 0) {
         completedTasks.clear();
         endGame();
+        return null;
     }
+
+    keyCount = 0;
+    keys = 0;
+    document.getElementById("keys").innerText = keys;
 
     const randomTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
     completedTasks.add(randomTask.id);
@@ -78,6 +84,10 @@ function getNextTask() {
 
 // ----- Save and Load Game State -----
 function saveGameState() {
+    if (!currentTask) {
+        console.error("Cannot save game state: currentTask is null or undefined.");
+        return;
+    }
     const gameState = {
         playerPosition,
         enemyPosition,
@@ -86,7 +96,12 @@ function saveGameState() {
         deaths,
         startTime,
         completedTasks: Array.from(completedTasks),
-        currentTask,
+        currentTask, // Ensure this is valid
+        enemies: enemies.map(enemy => ({
+            position: enemy.position,
+            index: enemy.index,
+            movingForward: enemy.movingForward
+        }))
     };
     localStorage.setItem("gameState", JSON.stringify(gameState));
 }
@@ -103,7 +118,21 @@ function loadGameState() {
         startTime = state.startTime;
         completedTasks = new Set(state.completedTasks);
         currentTask = state.currentTask;
-        setupLevel(currentTask); // Restore current level
+
+        if (currentTask && currentTask.enemies) {
+            enemies = state.enemies.map(savedEnemy => ({
+                path: currentTask.enemies.find(e => e.path[0].x === savedEnemy.position.x)?.path || [],
+                position: savedEnemy.position,
+                index: savedEnemy.index,
+                movingForward: savedEnemy.movingForward
+            }));
+        } else {
+            console.warn("Invalid currentTask or enemies, resetting to initial state.");
+            currentTask = getNextTask();
+            enemies = [];
+        }
+
+        setupLevel(currentTask);
     }
 }
 
@@ -135,14 +164,27 @@ function initializeGame() {
 }
 
 function setupLevel(task) {
+    if (!task) return;
+
     clearMaze();
     generateMaze(task);
     currentTask = task;
-    document.getElementById("collectibles").innerText = collectibles;
+
+    enemies = (task.enemies || []).map(enemy => ({
+        path: enemy.path,
+        position: enemy.path[0],
+        index: 0,
+        movingForward: true
+    }));
+
+    enemies.forEach(enemy => {
+        const initialCell = document.querySelector(`.cell[data-x="${enemy.position.x}"][data-y="${enemy.position.y}"]`);
+        if (initialCell) initialCell.classList.add("enemy");
+    });
 
     if (enemyInterval) clearInterval(enemyInterval);
-    if (enemyPosition.x !== 0 || enemyPosition.y !== 0) {
-        enemyInterval = setInterval(moveEnemy, task.enemySpeed);
+    if (enemies.length > 0) {
+        enemyInterval = setInterval(moveEnemies, 500);
     }
 }
 
@@ -165,6 +207,7 @@ function generateMaze(task) {
                     cell.classList.add("wall");
                     break;
                 case "player":
+                    playerStart = { x: col, y: row };
                     playerPosition = { x: col, y: row };
                     cell.classList.add("player");
                     break;
@@ -176,9 +219,8 @@ function generateMaze(task) {
                     cell.classList.add("key");
                     keyCount += 1;
                     break;
-                case "enemy":
-                    enemyPosition = { x: col, y: row };
-                    cell.classList.add("enemy");
+                case "trap":
+                    cell.classList.add("trap");
                     break;
                 case "exit":
                     exitPosition = { x: col, y: row };
@@ -188,6 +230,7 @@ function generateMaze(task) {
             maze.appendChild(cell);
         }
     }
+
     placePlayer();
 }
 
@@ -216,26 +259,97 @@ function collectKeys(cell) {
     checkWinCondition();
 }
 
+function trapPlayer() {
+    playerPosition = playerStart;
+    deaths += 1;
+    document.getElementById("deaths").innerText = deaths;
+    placePlayer();
+    saveGameState();
+}
+
+function handleInteractions(x, y, cell) {
+    if (!cell.classList.contains("wall")) {
+        if (cell.classList.contains("exit") && keys !== keyCount) {
+            return;
+        }
+
+        if (cell.classList.contains("exit-open")) {
+            checkWinCondition();
+        }
+
+        playerPosition = { x: x, y: y };
+        placePlayer();
+        saveGameState();
+    }
+
+    if (cell.classList.contains("collectible")) {
+        collectCollectibles(cell);
+    }
+
+    if (cell.classList.contains("key")) {
+        collectKeys(cell);
+    }
+
+    if (cell.classList.contains("trap")) {
+        trapPlayer();
+    }
+
+    enemies.forEach(enemy => {
+        if (playerPosition.x === enemy.position.x && playerPosition.y === enemy.position.y) {
+            trapPlayer();
+            console.log("Player caught by enemy!");
+        }
+    });
+}
+
+function moveEnemies() {
+    if (!isGameActive) return;
+
+    enemies.forEach(enemy => {
+        const currentCell = document.querySelector(`.cell[data-x="${enemy.position.x}"][data-y="${enemy.position.y}"]`);
+        if (currentCell) currentCell.classList.remove("enemy");
+    });
+
+    enemies.forEach(enemy => {
+        if (!enemy.path || enemy.path.length === 0) return;
+
+        // Update the enemy's path index
+        if (enemy.movingForward) {
+            enemy.index++;
+            if (enemy.index >= enemy.path.length) {
+                enemy.index = enemy.path.length - 1;
+                enemy.movingForward = false;
+            }
+        } else {
+            enemy.index--;
+            if (enemy.index < 0) {
+                enemy.index = 0;
+                enemy.movingForward = true;
+            }
+        }
+
+        // Update enemy position
+        enemy.position = enemy.path[enemy.index];
+
+        // Add "enemy" class to the new position
+        const newCell = document.querySelector(`.cell[data-x="${enemy.position.x}"][data-y="${enemy.position.y}"]`);
+        if (newCell) newCell.classList.add("enemy");
+
+        // Check if the enemy catches the player
+        if (enemy.position.x === playerPosition.x && enemy.position.y === playerPosition.y) {
+            trapPlayer();
+        }
+    });
+}
+
 function movePlayer(dx, dy) {
     const newX = playerPosition.x + dx;
     const newY = playerPosition.y + dy;
 
     if (newX >= 0 && newX < mazeSize && newY >= 0 && newY < mazeSize) {
         const newCell = document.querySelector(`.cell[data-x="${newX}"][data-y="${newY}"]`);
-        if (!newCell.classList.contains("wall")) {
-            playerPosition = { x: newX, y: newY };
-            placePlayer();
-            saveGameState();
-        }
 
-        if (newCell.classList.contains("collectible")) {
-            collectCollectibles(newCell);
-        }
-
-        if (newCell.classList.contains("key")) {
-            collectKeys(newCell);
-        }
-
+        handleInteractions(newX, newY, newCell);
         checkWinCondition();
     }
 }
@@ -311,10 +425,12 @@ window.addEventListener("keydown", (event) => {
     switch (event.key) {
         case "ArrowUp":
         case "w":
+            event.preventDefault();
             movePlayer(0, -1);
             break;
         case "ArrowDown":
         case "s":
+            event.preventDefault();
             movePlayer(0, 1);
             break;
         case "ArrowLeft":
@@ -328,10 +444,37 @@ window.addEventListener("keydown", (event) => {
     }
 });
 
+// ----- Mouse Controls -----
+maze.addEventListener("click", handleMouseClick);
+
+function handleMouseClick(event) {
+    if (!isGameActive) return;
+
+    const cell = event.target;
+    if (!cell.classList.contains("cell")) return;
+
+    const targetX = parseInt(cell.dataset.x, 10);
+    const targetY = parseInt(cell.dataset.y, 10);
+
+    const dx = targetX - playerPosition.x;
+    const dy = targetY - playerPosition.y;
+
+    if (Math.abs(dx) + Math.abs(dy) === 1) {
+        movePlayer(dx, dy);
+    }
+}
+
+
 // ----- Win and End Game -----
 function checkWinCondition() {
-    const allCollected = keyCount === keys;
+    const allCollected = (keyCount === keys);
     const playerAtExit = (playerPosition.x === exitPosition.x && playerPosition.y === exitPosition.y);
+
+    if (allCollected) {
+        const exitCell = document.querySelector(`.cell[data-x="${exitPosition.x}"][data-y="${exitPosition.y}"]`);
+        exitCell.classList.remove("exit");
+        exitCell.classList.add("exit-open");
+    }
 
     if (allCollected && playerAtExit) {
         setupLevel(getNextTask());
@@ -339,6 +482,7 @@ function checkWinCondition() {
 }
 
 function endGame() {
+    isGameActive = false;
     const elapsedTime = Date.now() - startTime;
     const minutes = Math.floor(elapsedTime / 60000);
     const seconds = Math.floor((elapsedTime % 60000) / 1000);
@@ -347,8 +491,8 @@ function endGame() {
     const endModalHTML = `
         <div id="endModal" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;">
             <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
-                <h2>Game Over!</h2>
-                <p>Total Time: ${minutes}m ${seconds}s<br>Collectibles: ${collectibles}<br>Keys: ${keys}<br>Deaths: ${deaths}</p>
+                <h2>Game Completed!</h2>
+                <p>Total Time: ${minutes}m ${seconds}s<br>Collectibles: ${collectibles} / 25<br>Deaths: ${deaths}</p>
                 <button id="restartButton" style="padding: 10px 20px;">Restart</button>
             </div>
         </div>`;
@@ -372,6 +516,9 @@ function restartGame() {
     collectibles = 0;
     keys = 0;
     deaths = 0;
+    document.getElementById("collectibles").innerText = collectibles;
+    document.getElementById("keys").innerText = keys;
+    document.getElementById("deaths").innerText = deaths;
     startTime = Date.now();
     clearMaze();
     setupLevel(getNextTask());

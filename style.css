@@ -126,21 +126,28 @@ header {
 
 .player {
     background-image: url('images/player.png');
-    background-size: contain;
+    background-size: 90%;
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .enemy {
     background-image: url('images/enemy.png');
-    background-size: contain;
+    background-size: 90%;
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .exit {
     background-image: url('images/exit.png');
-    background-size: contain;
+    background-size: 90%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.exit-open {
+    background-image: url('images/exitopen.png');
+    background-size: 90%;
     background-repeat: no-repeat;
     background-position: center;
 }
@@ -159,6 +166,13 @@ header {
     background-position: center;
 }
 
+.trap {
+    background-image: url('images/trap.png');
+    background-size: 90%;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 #info-bar div {
     font-size: 1.25em;
     font-weight: bold;
@@ -168,17 +182,8 @@ header {
     margin: 0 15px;
 }
 
-footer {
-    width: 100%;
-    margin-top: auto;
-}
-
 .navbar, .jumbotron, footer {
     margin: 0;
-}
-
-footer {
-    margin-top: auto;
 }
 
 #iosPermissionPopup {
@@ -202,6 +207,51 @@ footer {
     max-width: 90%;
     max-height: 90%;
     overflow: auto;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+}
+
+main {
+    width: 100%;
+    max-width: 800px;
+    padding: 20px;
+}
+
+.rule {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 20px;
+}
+
+h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #2c3e50;
+}
+
+p {
+    margin: 5px 0 0;
+    font-size: 1rem;
+    color: #34495e;
+}
+
+footer {
+    width: 100%;
+    margin-top: auto;
+    color: white;
 }
 
 @media (max-width: 768px) {
