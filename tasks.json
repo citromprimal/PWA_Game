@@ -15,8 +15,7 @@
         ["", "", "", "wall", "", "wall", "wall", "wall", "", "exit"],
         ["wall", "wall", "", "", "", "trap", "wall", "wall", "wall", "wall"]
       ],
-      "hint": "Find the path to the exit.",
-      "solution": "Move carefully around the enemy to reach the exit."
+      "help": "Move carefully around the enemy to reach the exit."
     },
     {
       "id": 2,
@@ -47,8 +46,7 @@
           ]
         }
       ],
-      "hint": "Avoid the moving enemy and gather all stars before heading to the exit.",
-      "solution": "Move carefully around the enemy to reach the exit."
+      "help": "Move carefully around the enemy to reach the exit."
     },
     {
       "id": 3,
@@ -139,8 +137,7 @@
           ]
         }
       ],
-      "hint": "Avoid the moving enemy and gather all stars before heading to the exit.",
-      "solution": "Move carefully around the enemy to reach the exit."
+      "help": "Follow the enemies clockwise to get the key and get to the exit. Hide at the collectibles a few times to avoid getting caught."
     }
   ]
 }

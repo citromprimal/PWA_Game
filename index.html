@@ -58,9 +58,14 @@
         <div id="maze"></div>
     </div>
 
-    <button onclick="restartGame()" class="btn btn-primary btn-lg">
-        <i class="bi bi-arrow-clockwise"></i> Restart Game
-    </button>
+    <div id="controls-wrapper">
+        <div id="controls">
+            <button class="button" onclick="toggleHelp()">
+                <i class="bi bi-info-circle-fill"></i> Show Help
+            </button>
+        </div>
+        <div id="helpField" style="display: none;"></div>
+    </div>
 
 </div>
 

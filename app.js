@@ -1,9 +1,9 @@
 // ----- Constants and Variables -----
 const mazeSize = 10; // 10x10 grid
-let playerStart = { x: 0, y: 0 }; // Player starting position
-let playerPosition = { x: 0, y: 0 }; // Player position
-let enemyPosition = { x: 0, y: 0 }; // Enemy position
-let exitPosition = { x: 0, y: 0 }; // Exit position
+let playerStart = {x: 0, y: 0}; // Player starting position
+let playerPosition = {x: 0, y: 0}; // Player position
+let enemyPosition = {x: 0, y: 0}; // Enemy position
+let exitPosition = {x: 0, y: 0}; // Exit position
 let collectibleCount = 0; // Number of collectibles in the maze
 let keyCount = 0; // Number of keys in the maze
 let enemyInterval = null; // Interval ID for enemy movement
@@ -19,7 +19,7 @@ let keys = 0;
 let tasks = []; // Array to hold loaded tasks
 let currentTask = null; // To keep track of the current task
 let completedTasks = new Set(); // Track completed tasks
-let movementAccumulator = { x: 0, y: 0 }; // For mobile gyroscope controls
+let movementAccumulator = {x: 0, y: 0}; // For mobile gyroscope controls
 
 const maze = document.getElementById("maze");
 const mazeContainer = document.getElementById("maze-container");
@@ -37,7 +37,8 @@ function setupStartModal() {
         <div id="startModal" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;">
             <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
                 <h2>Start Game?</h2>
-                <button id="startButton" style="padding: 10px 20px; font-size: 16px;">Start Game</button>
+                <br>
+                <button id="startButton" style="padding: 10px 20px; font-size: 16px;"><i class="bi bi-play-circle-fill"></i> Start Game</button>
             </div>
         </div>`;
     mazeContainer.insertAdjacentHTML("beforeend", startModalHTML);
@@ -145,6 +146,7 @@ function updateTimer() {
     document.getElementById("timer").innerText =
         `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
+
 setInterval(updateTimer, 1000);
 
 // ----- Maze Setup -----
@@ -169,6 +171,11 @@ function setupLevel(task) {
     clearMaze();
     generateMaze(task);
     currentTask = task;
+
+    const helpField = document.getElementById("helpField");
+    if (helpField.style.display === "block") {
+        helpField.innerHTML = `<p>${currentTask.help}</p>`;
+    }
 
     enemies = (task.enemies || []).map(enemy => ({
         path: enemy.path,
@@ -207,8 +214,8 @@ function generateMaze(task) {
                     cell.classList.add("wall");
                     break;
                 case "player":
-                    playerStart = { x: col, y: row };
-                    playerPosition = { x: col, y: row };
+                    playerStart = {x: col, y: row};
+                    playerPosition = {x: col, y: row};
                     cell.classList.add("player");
                     break;
                 case "collectible":
@@ -223,7 +230,7 @@ function generateMaze(task) {
                     cell.classList.add("trap");
                     break;
                 case "exit":
-                    exitPosition = { x: col, y: row };
+                    exitPosition = {x: col, y: row};
                     cell.classList.add("exit");
                     break;
             }
@@ -277,7 +284,7 @@ function handleInteractions(x, y, cell) {
             checkWinCondition();
         }
 
-        playerPosition = { x: x, y: y };
+        playerPosition = {x: x, y: y};
         placePlayer();
         saveGameState();
     }
@@ -377,7 +384,7 @@ function requestDeviceOrientationPermission() {
 
 function handleDeviceOrientation(event) {
     if (!isGameActive) return;
-    const { beta, gamma } = event;
+    const {beta, gamma} = event;
     const scaleFactor = 0.003;
 
     movementAccumulator.x += gamma * scaleFactor;
@@ -413,7 +420,7 @@ function showIOSPermissionPopup() {
 
     document.body.appendChild(popup);
 
-    document.getElementById("enableMotion").onclick = function() {
+    document.getElementById("enableMotion").onclick = function () {
         requestDeviceOrientationPermission();
         popup.remove();
     };
@@ -493,7 +500,8 @@ function endGame() {
             <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
                 <h2>Game Completed!</h2>
                 <p>Total Time: ${minutes}m ${seconds}s<br>Collectibles: ${collectibles} / 25<br>Deaths: ${deaths}</p>
-                <button id="restartButton" style="padding: 10px 20px;">Restart</button>
+                <br>
+                <button id="restartButton" style="padding: 10px 20px;"><i class="bi bi-arrow-clockwise"></i>Restart</button>
             </div>
         </div>`;
     mazeContainer.insertAdjacentHTML("beforeend", endModalHTML);
@@ -506,11 +514,31 @@ function endGame() {
     localStorage.removeItem("gameState");
 }
 
+// ----- Help Player -----
+function toggleHelp() {
+    const helpField = document.getElementById("helpField");
+    const helpButton = document.querySelector("button[onclick='toggleHelp()']");
+
+    if (helpField.style.display === "block") {
+        helpField.style.display = "none";
+        helpButton.style.backgroundColor = "#007bff";
+    } else {
+        if (!currentTask || !currentTask.help) {
+            console.error("No help text available for the current task.");
+            return;
+        }
+        helpField.innerText = currentTask.help;
+        helpField.style.display = "block";
+        helpButton.style.backgroundColor = "#014e9f";
+    }
+}
+
+
 // ----- Restart Game -----
 function restartGame() {
-    playerPosition = { x: 0, y: 0 };
-    enemyPosition = { x: 0, y: 0 };
-    exitPosition = { x: 0, y: 0 };
+    playerPosition = {x: 0, y: 0};
+    enemyPosition = {x: 0, y: 0};
+    exitPosition = {x: 0, y: 0};
     collectibleCount = 0;
     keyCount = 0;
     collectibles = 0;
@@ -522,4 +550,5 @@ function restartGame() {
     startTime = Date.now();
     clearMaze();
     setupLevel(getNextTask());
+    setupStartModal();
 }
