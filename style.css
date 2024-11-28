@@ -8,7 +8,6 @@ body {
     font-family: Arial, sans-serif;
     color: #333;
     background-color: #f0f0f0;
-    margin: 0;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -86,6 +85,19 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+button[onclick='toggleHelp()'] {
+    background-color: #007bff;
+    transition: background-color 0.3s;
+}
+
+button[onclick='toggleHelp()']:hover {
+    background-color: #0056b3;
+}
+
+button[onclick='toggleHelp()'].active {
+    background-color: #014e9f;
 }
 
 header {
@@ -245,7 +257,6 @@ h2 {
 p {
     margin: 5px 0 0;
     font-size: 1rem;
-    color: #34495e;
 }
 
 #controls-wrapper {
