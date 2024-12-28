@@ -18,40 +18,81 @@ let gameState = {
 };
 
 // Game state variables
-let startTime = null;
 let deaths = 0;
 let collectibles = 0;
+let collectibleCount = 0;
+let collectiblesCollected = 0;
 let keys = 0;
-let tasks = [];
-let currentTask = null;
-let completedTasks = new Set();
+let keyCount = 0;
 let movementAccumulator = {x: 0, y: 0};
 
 let enemyInterval = null;
 const maze = document.getElementById("maze");
 const mazeContainer = document.getElementById("maze-container");
+const backgroundMusic = document.getElementById("backgroundMusic");
+const muteButton = document.getElementById("muteButton");
+
+// ----- Audio Controls -----
+function playMusic() {
+    backgroundMusic.volume = 0.2;
+    backgroundMusic.play();
+    backgroundMusic.muted = false;
+}
+
+function stopMusic() {
+    backgroundMusic.pause();
+    backgroundMusic.currentTime = 0;
+}
+
+muteButton.addEventListener("click", () => {
+    const icon = muteButton.querySelector("i");
+    if (backgroundMusic.muted) {
+        backgroundMusic.muted = false;
+        icon.classList.remove("bi-volume-mute");
+        icon.classList.add("bi-volume-up");
+    } else {
+        backgroundMusic.muted = true;
+        icon.classList.remove("bi-volume-up");
+        icon.classList.add("bi-volume-mute");
+    }
+});
 
 // ----- Save and Load Game State -----
 function saveGameState() {
-    const savedState = {
-        completedTasks: Array.from(gameState.completedTasks),
-        deaths: gameState.deaths,
-        tasks: gameState.tasks,
-    };
-    localStorage.setItem("gameState", JSON.stringify(savedState));
+    try {
+        const serializedState = JSON.stringify(gameState);
+        localStorage.setItem("gameState", serializedState);
+    } catch (error) {
+        console.error("Failed to save game state:", error);
+    }
 }
 
 function loadGameState() {
-    const savedState = JSON.parse(localStorage.getItem("gameState"));
+    const savedState = localStorage.getItem("gameState");
+
     if (savedState) {
-        gameState.completedTasks = new Set(savedState.completedTasks || []);
-        gameState.deaths = savedState.deaths || 0;
-        gameState.tasks = savedState.tasks || [];
+        try {
+            const parsedState = JSON.parse(savedState);
+
+            gameState.completedTasks = new Set(Array.isArray(parsedState.completedTasks) ? parsedState.completedTasks : []);
+
+            gameState.deaths = typeof parsedState.deaths === "number" ? parsedState.deaths : 0;
+            gameState.tasks = Array.isArray(parsedState.tasks) ? parsedState.tasks : [];
+
+            console.log("Loaded game state:", gameState);
+        } catch (error) {
+            console.error("Failed to parse saved game state:", error);
+            resetGameState();
+        }
+    } else {
+        console.log("No saved game state found. Initializing a new game.");
+        resetGameState();
     }
 }
 
 // ----- Reset Game State -----
 function resetGameState() {
+    const tasksBackup = gameState.tasks;
     gameState = {
         playerPosition: { x: 0, y: 0 },
         playerStart: { x: 0, y: 0 },
@@ -66,7 +107,7 @@ function resetGameState() {
         startTime: null,
         isGameActive: false,
         isTimerRunning: false,
-        tasks: [],
+        tasks: tasksBackup || [],
         enemies: [],
     };
 
@@ -83,29 +124,31 @@ function resetGameState() {
 }
 
 // ----- Initialization -----
-window.onload = () => {
+window.onload = async () => {
     setupStartModal();
-    loadTasks().then(() => {
+    try {
+        await loadTasks();
         loadGameState();
         console.log("Game state tasks loaded:", gameState.tasks);
         initializeGame();
-    });
+    } catch (error) {
+        console.error("Failed to initialize game:", error);
+    }
 };
 
 function initializeGame() {
-    if (gameState.tasks.length === 0) {
-        console.error("No tasks found. Ensure tasks.json is loaded.");
-        return;
+    if (!gameState.tasks || gameState.tasks.length === 0) {
+        console.error("No tasks available. Cannot initialize the game.");
     }
 
-    const nextTask = getNextTask();
-    if (!nextTask) {
-        console.error("Failed to initialize game: No valid task available.");
-        return;
+    if (!gameState.isGameActive) {
+        console.log("Starting a new game...");
+        const nextTask = getNextTask();
+        if (!nextTask) {
+            console.error("No valid task to start the game.");
+        }
+        setupLevel(nextTask);
     }
-
-    console.log("Initializing game with task:", nextTask);
-    setupLevel(nextTask);
 
     if (isIOS()) {
         showIOSPermissionPopup();
@@ -116,50 +159,83 @@ function initializeGame() {
 
 // ----- Restart Game -----
 function restartGame() {
+    console.log("Restarting the game...");
+
+    const endModal = document.getElementById("endModal");
+    if (endModal) endModal.remove();
+
     resetGameState();
     initializeGame();
+    setupStartModal();
+    console.log("Game restarted successfully.");
 }
 
 // ----- Task Management -----
 async function loadTasks() {
     try {
+        console.log("Attempting to load tasks.json...");
         const response = await fetch('tasks.json');
-        if (!response.ok) console.error("Failed to load tasks.json");
+        if (!response.ok) {
+            console.log(`Failed to fetch tasks.json. Status: ${response.status}`);
+            return;
+        }
 
         const data = await response.json();
-        console.log("Loaded tasks data:", data);
+        if (!data.tasks || !Array.isArray(data.tasks) || data.tasks.length === 0) {
+            console.log("Invalid or empty tasks.json file.");
+            return;
+        }
+
         gameState.tasks = data.tasks;
-
+        console.log("Tasks successfully loaded:", gameState.tasks);
     } catch (error) {
-        console.error("Error loading tasks:", error);
+        console.error("Error loading tasks.json:", error);
     }
-
-    console.log("Tasks loaded:", gameState.tasks);
-    gameState.tasks.forEach((task, index) => {
-        console.log(`Task ${index + 1}:`, task);
-    });
 }
 
 function getNextTask() {
-    const availableTasks = gameState.tasks.filter(task => {
-        return task && Array.isArray(task.maze) && task.maze.length > 0 && !gameState.completedTasks.has(task.id);
-    });
-
-    if (availableTasks.length === 0) {
-        console.warn("No available tasks after filtering.");
+    // Validate the tasks array
+    if (!gameState.tasks || !Array.isArray(gameState.tasks)) {
+        console.error("Tasks array is missing or invalid:", gameState.tasks);
         endGame();
         return null;
     }
 
+    // Filter out tasks that don't meet the criteria
+    const availableTasks = gameState.tasks.filter(task => {
+        if (!task || !task.id) {
+            console.warn("Invalid task detected and ignored:", task);
+            return false; // Skip invalid tasks
+        }
+        return Array.isArray(task.maze) && task.maze.length > 0 && !gameState.completedTasks.has(task.id);
+    });
+
+    // Check if there are no available tasks
+    if (availableTasks.length === 0) {
+        console.log("No more tasks available. Ending game.");
+        endGame();
+        return null;
+    }
+
+    // Shuffle the available tasks
     for (let i = availableTasks.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [availableTasks[i], availableTasks[j]] = [availableTasks[j], availableTasks[i]];
     }
 
+    // Select the next task
     const nextTask = availableTasks[0];
+    if (!nextTask || !nextTask.id) {
+        console.error("Next task is invalid:", nextTask);
+        endGame();
+        return null;
+    }
+
+    // Mark the task as completed
     gameState.completedTasks.add(nextTask.id);
     return nextTask;
 }
+
 
 // ----- Start Modal -----
 function setupStartModal() {
@@ -178,6 +254,7 @@ function setupStartModal() {
         gameState.isGameActive = true;
         gameState.isTimerRunning = true;
         gameState.startTime = Date.now();
+        playMusic();
     });
 }
 
@@ -195,7 +272,7 @@ setInterval(updateTimer, 1000);
 
 // ----- Maze Setup -----
 function setupLevel(task) {
-    console.log("Setting up level for task:", task); // Debugging log
+    gameState.isTimerRunning = true;
     if (!task || !task.maze || !Array.isArray(task.maze)) {
         console.error("Invalid task or maze data:", task);
         return;
@@ -240,8 +317,6 @@ function clearMaze() {
 }
 
 function generateMaze(task) {
-    console.log("Generating maze for task:", task);
-
     if (!task.maze || !Array.isArray(task.maze) || task.maze.length === 0) {
         console.error("Invalid maze data for task:", task);
         return;
@@ -307,6 +382,7 @@ function placePlayer() {
 function collectCollectibles(cell) {
     cell.classList.remove("collectible");
     collectibles += 1;
+    collectiblesCollected += 1;
     document.getElementById("collectibles").innerText = collectibles;
     checkWinCondition();
 }
@@ -519,6 +595,7 @@ function handleMouseClick(event) {
 
 // ----- Level Stats Modal -----
 function showLevelStatsModal() {
+    gameState.isTimerRunning = false;
     const elapsedTime = Date.now() -  gameState.startTime;
     const minutes = Math.floor(elapsedTime / 60000);
     const seconds = Math.floor((elapsedTime % 60000) / 1000);
@@ -541,6 +618,9 @@ function showLevelStatsModal() {
 
     document.getElementById("continueButton").addEventListener("click", () => {
         document.getElementById("levelStatsModal").remove();
+        document.getElementById("collectibles").innerText = 0;
+        document.getElementById("keys").innerText = 0;
+        document.getElementById("deaths").innerText = 0;
         const nextTask = getNextTask();
         if (nextTask) {
             setupLevel(nextTask);
@@ -569,6 +649,12 @@ function checkWinCondition() {
 }
 
 function endGame() {
+    if (document.getElementById("endModal")) {
+        console.warn("End modal already exists. Skipping duplicate creation.");
+        return;
+    }
+
+    stopMusic();
     gameState.isGameActive = false;
     const elapsedTime = Date.now() - gameState.startTime;
     const minutes = Math.floor(elapsedTime / 60000);
@@ -579,7 +665,7 @@ function endGame() {
         <div id="endModal" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;">
             <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
                 <h2>Game Completed!</h2>
-                <p>Total Time: ${minutes}m ${seconds}s<br>Collectibles: ${collectibles} / 25<br>Deaths: ${deaths}</p>
+                <p>Total Time: ${minutes}m ${seconds}s<br>Collectibles: ${collectiblesCollected} / 25<br>Deaths: ${deaths}</p>
                 <br>
                 <button id="restartButton"><i class="bi bi-arrow-clockwise"></i>Restart</button>
             </div>
@@ -590,8 +676,6 @@ function endGame() {
         document.getElementById("endModal").remove();
         restartGame();
     });
-
-    localStorage.removeItem("gameState");
 }
 
 // ----- Help Player -----

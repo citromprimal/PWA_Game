@@ -2,7 +2,6 @@
   "tasks": [
     {
       "id": 1,
-      "difficulty": "Easy",
       "maze": [
         ["player", "wall", "", "wall", "trap", "", "", "", "", ""],
         ["", "wall", "", "wall", "wall", "", "wall", "", "wall", ""],
@@ -15,11 +14,11 @@
         ["", "", "", "wall", "", "wall", "wall", "wall", "", "exit"],
         ["wall", "wall", "", "", "", "trap", "wall", "wall", "wall", "wall"]
       ],
-      "help": "Move carefully around the enemy to reach the exit."
+      "difficulty": "Easy",
+      "help": "Try finding the right path by going up, right, then down. Avoid the traps and collect the collectibles."
     },
     {
       "id": 2,
-      "difficulty": "Medium",
       "maze": [
         ["exit", "", "", "", "", "wall", "wall", "wall", "collectible", ""],
         ["wall", "wall", "collectible", "wall", "", "", "", "", "wall", ""],
@@ -46,11 +45,11 @@
           ]
         }
       ],
+      "difficulty": "Medium",
       "help": "Avoid the enemy to get the key then go to the right side and up to find the path to the exit."
     },
     {
       "id": 3,
-      "difficulty": "Hard",
       "maze": [
         ["wall", "collectible", "wall", "wall", "wall", "wall", "wall", "wall", "wall", "wall"],
         ["wall", "enemy", "", "", "", "", "", "", "enemy", "player"],
@@ -137,7 +136,104 @@
           ]
         }
       ],
+      "difficulty": "Hard",
       "help": "Follow the enemies clockwise to get the key and get to the exit. Hide at the collectibles a few times to avoid getting caught."
+    },
+    {
+      "id": 4,
+      "maze": [
+        ["collectible", "", "", "", "", "", "", "", "", "wall"],
+        ["wall", "trap", "wall", "", "wall", "wall", "", "wall", "", "wall"],
+        ["", "wall", "wall", "", "wall", "", "", "wall", "collectible", "trap"],
+        ["", "", "trap", "wall", "", "", "wall", "", "", ""],
+        ["", "wall", "wall", "wall", "", "wall", "collectible", "", "wall", ""],
+        ["", "", "", "", "", "trap", "wall", "wall", "", ""],
+        ["", "wall", "", "wall", "", "wall", "trap", "wall", "", "exit"],
+        ["", "wall", "", "wall", "", "", "", "wall", "", "wall"],
+        ["trap", "", "", "", "wall", "wall", "", "wall", "", ""],
+        ["wall", "collectible", "wall", "", "key", "wall", "player", "trap", "wall", "collectible"]
+      ],
+      "difficulty": "Easy",
+      "help": "First go to the left side to get the key, then try going up, right and down."
+    },
+    {
+      "id": 5,
+      "maze": [
+        ["key", "enemy", "", "", "", "", "", "", "", "exit"],
+        ["wall", "wall", "wall", "wall", "wall", "wall", "wall", "", "wall", "wall"],
+        ["wall", "", "", "", "", "", "", "", "enemy", "collectible"],
+        ["wall", "wall", "", "wall", "wall", "wall", "wall", "wall", "wall", "wall"],
+        ["collectible", "enemy", "", "", "", "", "", "", "", "wall"],
+        ["wall", "wall", "wall", "wall", "wall", "wall", "wall", "", "wall", "wall"],
+        ["wall", "", "", "", "", "", "", "", "enemy", "collectible"],
+        ["wall", "wall", "", "wall", "wall", "wall", "wall", "wall", "wall", "wall"],
+        ["collectible", "enemy", "", "", "", "", "", "", "", "player"],
+        ["wall", "key", "wall", "wall", "collectible", "wall", "wall", "wall", "wall", "wall"]
+      ],
+      "enemies": [
+        {
+          "path": [
+            { "x": 1, "y": 0 },
+            { "x": 2, "y": 0 },
+            { "x": 3, "y": 0 },
+            { "x": 4, "y": 0 },
+            { "x": 5, "y": 0 },
+            { "x": 6, "y": 0 },
+            { "x": 7, "y": 0 },
+            { "x": 8, "y": 0 }
+          ]
+        },
+        {
+          "path": [
+            { "x": 8, "y": 2 },
+            { "x": 7, "y": 2 },
+            { "x": 6, "y": 2 },
+            { "x": 5, "y": 2 },
+            { "x": 4, "y": 2 },
+            { "x": 3, "y": 2 },
+            { "x": 2, "y": 2 },
+            { "x": 1, "y": 2 }
+          ]
+        },
+        {
+          "path": [
+            { "x": 1, "y": 4 },
+            { "x": 2, "y": 4 },
+            { "x": 3, "y": 4 },
+            { "x": 4, "y": 4 },
+            { "x": 5, "y": 4 },
+            { "x": 6, "y": 4 },
+            { "x": 7, "y": 4 },
+            { "x": 8, "y": 4 }
+          ]
+        },
+        {
+          "path": [
+            { "x": 8, "y": 6 },
+            { "x": 7, "y": 6 },
+            { "x": 6, "y": 6 },
+            { "x": 5, "y": 6 },
+            { "x": 4, "y": 6 },
+            { "x": 3, "y": 6 },
+            { "x": 2, "y": 6 },
+            { "x": 1, "y": 6 }
+          ]
+        },
+        {
+          "path": [
+            { "x": 1, "y": 8 },
+            { "x": 2, "y": 8 },
+            { "x": 3, "y": 8 },
+            { "x": 4, "y": 8 },
+            { "x": 5, "y": 8 },
+            { "x": 6, "y": 8 },
+            { "x": 7, "y": 8 },
+            { "x": 8, "y": 8 }
+          ]
+        }
+      ],
+      "difficulty": "Hard",
+      "help": "Make your way up to the exit, while collecting the keys and avoiding the enemies."
     }
   ]
 }
