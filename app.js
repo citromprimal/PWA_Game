@@ -194,14 +194,12 @@ async function loadTasks() {
 }
 
 function getNextTask() {
-    // Validate the tasks array
     if (!gameState.tasks || !Array.isArray(gameState.tasks)) {
         console.error("Tasks array is missing or invalid:", gameState.tasks);
         endGame();
         return null;
     }
 
-    // Filter out tasks that don't meet the criteria
     const availableTasks = gameState.tasks.filter(task => {
         if (!task || !task.id) {
             console.warn("Invalid task detected and ignored:", task);
@@ -210,20 +208,17 @@ function getNextTask() {
         return Array.isArray(task.maze) && task.maze.length > 0 && !gameState.completedTasks.has(task.id);
     });
 
-    // Check if there are no available tasks
     if (availableTasks.length === 0) {
         console.log("No more tasks available. Ending game.");
         endGame();
         return null;
     }
 
-    // Shuffle the available tasks
     for (let i = availableTasks.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [availableTasks[i], availableTasks[j]] = [availableTasks[j], availableTasks[i]];
     }
 
-    // Select the next task
     const nextTask = availableTasks[0];
     if (!nextTask || !nextTask.id) {
         console.error("Next task is invalid:", nextTask);
@@ -231,7 +226,6 @@ function getNextTask() {
         return null;
     }
 
-    // Mark the task as completed
     gameState.completedTasks.add(nextTask.id);
     return nextTask;
 }
@@ -239,6 +233,11 @@ function getNextTask() {
 
 // ----- Start Modal -----
 function setupStartModal() {
+    const existingModal = document.getElementById("startModal");
+    if (existingModal) {
+        mazeContainer.removeChild(existingModal);
+    }
+
     const startModalHTML = `
         <div id="startModal" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;">
             <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
@@ -649,9 +648,9 @@ function checkWinCondition() {
 }
 
 function endGame() {
-    if (document.getElementById("endModal")) {
-        console.warn("End modal already exists. Skipping duplicate creation.");
-        return;
+    const existingModal = document.getElementById("endModal");
+    if (existingModal) {
+        mazeContainer.removeChild(existingModal);
     }
 
     stopMusic();
