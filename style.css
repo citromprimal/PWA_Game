@@ -107,9 +107,9 @@ header {
 
 #maze {
     display: grid;
-    grid-template-columns: repeat(10, 1fr); /* 10 columns that fill available width */
-    grid-template-rows: repeat(10, 1fr);    /* 10 rows that fill available height */
-    gap: 2px; /* Space between cells */
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
+    gap: 2px;
     background-color: #444;
     padding: 10px;
     border-radius: 5px;
@@ -248,8 +248,9 @@ h1 {
 }
 
 main {
-    width: 100%;
+    position: relative;
     max-width: 800px;
+
     padding: 20px;
 }
 
@@ -319,6 +320,22 @@ p {
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     font-family: Arial, sans-serif;
+}
+
+#printButton {
+    position: absolute;
+    left: 100%;
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: #2c3e50;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#printButton:hover {
+    background-color: #3f556a;
 }
 
 footer {

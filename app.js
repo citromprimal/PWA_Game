@@ -60,8 +60,12 @@ muteButton.addEventListener("click", () => {
 // ----- Save and Load Game State -----
 function saveGameState() {
     try {
-        const serializedState = JSON.stringify(gameState);
+        const serializedState = JSON.stringify({
+            ...gameState,
+            completedTasks: [...gameState.completedTasks]
+        });
         localStorage.setItem("gameState", serializedState);
+        console.log("Game state saved:", serializedState);
     } catch (error) {
         console.error("Failed to save game state:", error);
     }
@@ -203,7 +207,7 @@ function getNextTask() {
     const availableTasks = gameState.tasks.filter(task => {
         if (!task || !task.id) {
             console.warn("Invalid task detected and ignored:", task);
-            return false; // Skip invalid tasks
+            return false;
         }
         return Array.isArray(task.maze) && task.maze.length > 0 && !gameState.completedTasks.has(task.id);
     });
@@ -220,12 +224,6 @@ function getNextTask() {
     }
 
     const nextTask = availableTasks[0];
-    if (!nextTask || !nextTask.id) {
-        console.error("Next task is invalid:", nextTask);
-        endGame();
-        return null;
-    }
-
     gameState.completedTasks.add(nextTask.id);
     return nextTask;
 }
@@ -573,24 +571,24 @@ window.addEventListener("keydown", (event) => {
 });
 
 // ----- Mouse Controls -----
-maze.addEventListener("click", handleMouseClick);
+maze.addEventListener("mousemove", (event) => {
+    // Get the cell under the cursor
+    const cell = document.elementFromPoint(event.clientX, event.clientY);
 
-function handleMouseClick(event) {
-    if (!gameState.isGameActive) return;
-
-    const cell = event.target;
-    if (!cell.classList.contains("cell")) return;
+    if (!cell || !cell.classList.contains("cell")) return; // Ignore non-cell elements
 
     const targetX = parseInt(cell.dataset.x, 10);
     const targetY = parseInt(cell.dataset.y, 10);
 
+    // Only move to adjacent cells
     const dx = targetX - gameState.playerPosition.x;
     const dy = targetY - gameState.playerPosition.y;
 
     if (Math.abs(dx) + Math.abs(dy) === 1) {
-        movePlayer(dx, dy);
+        movePlayer(dx, dy); // Move the player
     }
-}
+});
+
 
 // ----- Level Stats Modal -----
 function showLevelStatsModal() {
@@ -620,6 +618,9 @@ function showLevelStatsModal() {
         document.getElementById("collectibles").innerText = 0;
         document.getElementById("keys").innerText = 0;
         document.getElementById("deaths").innerText = 0;
+
+        saveGameState();
+
         const nextTask = getNextTask();
         if (nextTask) {
             setupLevel(nextTask);
@@ -694,4 +695,15 @@ function toggleHelp() {
         helpField.style.display = "block";
         helpButton.classList.add("active");
     }
+}
+
+// ----- Service Worker Registration -----
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/service-worker.js").then((registration) => {
+            console.log("Service Worker registered with scope:", registration.scope);
+        }).catch((error) => {
+            console.error("Service Worker registration failed:", error);
+        });
+    });
 }

@@ -1,0 +1,16 @@
+{
+  "name": "Maze Runner Game",
+  "short_name": "Maze Runner",
+  "description": "A fun maze game to challenge your skills!",
+  "start_url": "https://webte1.fei.stuba.sk/~xbohak/xbohak_xbagin_zp/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2c3e50",
+  "icons": [
+    {
+      "src": "images/player.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
