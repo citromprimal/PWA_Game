@@ -354,6 +354,13 @@ footer {
         position: relative;
         left: 0;
     }
+
+    #printButton {
+        position: relative;
+        left: 0;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -369,5 +376,17 @@ footer {
     #info-bar div {
         font-size: 0.7em;
         font-weight: bold;
+    }
+}
+
+@media (max-width: 500px) {
+    .jumbotron h1 {
+        font-size: 2.5rem;
+    }
+
+    .mute-button {
+        position: absolute;
+        top: 102%;
+        right: 10%;
     }
 }

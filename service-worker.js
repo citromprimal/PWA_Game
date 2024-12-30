@@ -3,7 +3,10 @@ const urlsToCache = [
     "/",
     "/index.html",
     "/description.html",
+    "/styles.css",
     "/app.js",
+    "/tasks.json",
+    "/manifest.json",
     "/images/collectible.png",
     "/images/description.png",
     "/images/enemy.png",
@@ -12,36 +15,38 @@ const urlsToCache = [
     "/images/key.png",
     "/images/player.png",
     "/images/trap.png",
-    "/music/backgroundmusic.mp3",
-    "/tasks.json",
-    "/styles.css"
+    "/music/backgroundmusic.mp3"
 ];
 
-self.addEventListener("install", (event) => {
+self.addEventListener('install', event => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            console.log("Opened cache");
+        caches.open(CACHE_NAME).then(cache => {
+            console.log('Caching app assets...');
             return cache.addAll(urlsToCache);
+        }).catch(error => {
+            console.error('Failed to cache assets:', error);
         })
     );
 });
 
-self.addEventListener("fetch", (event) => {
+self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request).then((response) => {
+        caches.match(event.request).then(response => {
             return response || fetch(event.request);
+        }).catch(error => {
+            console.error('Fetch failed:', error);
         })
     );
 });
 
-self.addEventListener("activate", (event) => {
-    const cacheWhitelist = [CACHE_NAME];
+self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
+        caches.keys().then(cacheNames => {
             return Promise.all(
-                cacheNames.map((cacheName) => {
-                    if (!cacheWhitelist.includes(cacheName)) {
-                        return caches.delete(cacheName);
+                cacheNames.map(cache => {
+                    if (cache !== CACHE_NAME) {
+                        console.log('Deleting old cache:', cache);
+                        return caches.delete(cache);
                     }
                 })
             );
