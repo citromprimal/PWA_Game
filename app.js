@@ -504,7 +504,7 @@ function requestDeviceOrientationPermission() {
 function handleDeviceOrientation(event) {
     if (!gameState.isGameActive) return;
     const {beta, gamma} = event;
-    const scaleFactor = 0.003;
+    const scaleFactor = 0.001 ;
 
     movementAccumulator.x += gamma * scaleFactor;
     movementAccumulator.y += beta * scaleFactor;
@@ -572,20 +572,18 @@ window.addEventListener("keydown", (event) => {
 
 // ----- Mouse Controls -----
 maze.addEventListener("mousemove", (event) => {
-    // Get the cell under the cursor
     const cell = document.elementFromPoint(event.clientX, event.clientY);
 
-    if (!cell || !cell.classList.contains("cell")) return; // Ignore non-cell elements
+    if (!cell || !cell.classList.contains("cell")) return;
 
     const targetX = parseInt(cell.dataset.x, 10);
     const targetY = parseInt(cell.dataset.y, 10);
 
-    // Only move to adjacent cells
     const dx = targetX - gameState.playerPosition.x;
     const dy = targetY - gameState.playerPosition.y;
 
     if (Math.abs(dx) + Math.abs(dy) === 1) {
-        movePlayer(dx, dy); // Move the player
+        movePlayer(dx, dy);
     }
 });
 
