@@ -15,13 +15,13 @@ let gameState = {
     isGameActive: false,
     tasks: [],
     enemies: [],
+    elapsedTime: 0,
+    isTimerRunning: false
 };
 
-// Game state variables
-let deaths = 0;
+// ----- Game state variables -----
 let collectibles = 0;
 let collectibleCount = 0;
-let collectiblesCollected = 0;
 let keys = 0;
 let keyCount = 0;
 let movementAccumulator = {x: 0, y: 0};
@@ -60,9 +60,11 @@ muteButton.addEventListener("click", () => {
 // ----- Save and Load Game State -----
 function saveGameState() {
     try {
+        const elapsedTime = gameState.isTimerRunning ? Date.now() - gameState.startTime : gameState.elapsedTime;
         const serializedState = JSON.stringify({
             ...gameState,
-            completedTasks: [...gameState.completedTasks]
+            completedTasks: [...gameState.completedTasks],
+            elapsedTime: elapsedTime
         });
         localStorage.setItem("gameState", serializedState);
         console.log("Game state saved:", serializedState);
@@ -82,8 +84,18 @@ function loadGameState() {
 
             gameState.deaths = typeof parsedState.deaths === "number" ? parsedState.deaths : 0;
             gameState.tasks = Array.isArray(parsedState.tasks) ? parsedState.tasks : [];
+            gameState.collectibles = typeof parsedState.collectibles === "number" ? parsedState.collectibles : 0;
+            gameState.keys = typeof parsedState.keys === "number" ? parsedState.keys : 0;
+            gameState.elapsedTime = typeof parsedState.elapsedTime === "number" ? parsedState.elapsedTime : 0;
+            gameState.startTime = Date.now() - gameState.elapsedTime;
+
+            document.getElementById("collectibles").innerText = gameState.collectibles;
+            document.getElementById("deaths").innerText = gameState.deaths;
 
             console.log("Loaded game state:", gameState);
+
+            showContinueGameModal();
+            return true;
         } catch (error) {
             console.error("Failed to parse saved game state:", error);
             resetGameState();
@@ -92,6 +104,7 @@ function loadGameState() {
         console.log("No saved game state found. Initializing a new game.");
         resetGameState();
     }
+    return false;
 }
 
 // ----- Reset Game State -----
@@ -113,6 +126,7 @@ function resetGameState() {
         isTimerRunning: false,
         tasks: tasksBackup || [],
         enemies: [],
+        elapsedTime: 0
     };
 
     if (enemyInterval) clearInterval(enemyInterval);
@@ -129,12 +143,12 @@ function resetGameState() {
 
 // ----- Initialization -----
 window.onload = async () => {
-    setupStartModal();
     try {
         await loadTasks();
-        loadGameState();
+        const continueGameModalShown = loadGameState();
         console.log("Game state tasks loaded:", gameState.tasks);
         initializeGame();
+        if (!continueGameModalShown) setupStartModal();
     } catch (error) {
         console.error("Failed to initialize game:", error);
     }
@@ -228,7 +242,6 @@ function getNextTask() {
     return nextTask;
 }
 
-
 // ----- Start Modal -----
 function setupStartModal() {
     const existingModal = document.getElementById("startModal");
@@ -247,10 +260,45 @@ function setupStartModal() {
     mazeContainer.insertAdjacentHTML("beforeend", startModalHTML);
 
     document.getElementById("startButton").addEventListener("click", () => {
-        document.getElementById("startModal").style.display = "none";
+        mazeContainer.removeChild(document.getElementById("startModal"));
         gameState.isGameActive = true;
         gameState.isTimerRunning = true;
         gameState.startTime = Date.now();
+        playMusic();
+    });
+}
+
+// ----- Continue Game Modal -----
+function showContinueGameModal() {
+    const existingModal = document.getElementById("continueGameModal");
+    if (existingModal) {
+        mazeContainer.removeChild(existingModal);
+    }
+
+    const elapsedTime = gameState.elapsedTime;
+    const minutes = Math.floor(elapsedTime / 60000);
+    const seconds = Math.floor((elapsedTime % 60000) / 1000);
+    const completedLevels = gameState.completedTasks.size;
+
+    const continueGameHTML = `
+        <div id="continueGameModal" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;">
+            <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; width: 80%; max-width: 400px;">
+                <h2>Continue Game?</h2>
+                 <p>Levels completed: ${completedLevels} / 5</p>
+                <p>Time Elapsed: ${minutes}m ${seconds}s</p>
+                <p>Collectibles: ${gameState.collectibles}</p>
+                <p>Deaths: ${gameState.deaths}</p>
+                <br>
+                <button id="continueGameButton" style="padding: 10px 20px; font-size: 16px;">Continue</button>
+            </div>
+        </div>`;
+    mazeContainer.insertAdjacentHTML("beforeend", continueGameHTML);
+
+    document.getElementById("continueGameButton").addEventListener("click", () => {
+        mazeContainer.removeChild(document.getElementById("continueGameModal"));
+        gameState.isGameActive = true;
+        gameState.isTimerRunning = true;
+        gameState.startTime = Date.now() - gameState.elapsedTime;
         playMusic();
     });
 }
@@ -259,6 +307,7 @@ function setupStartModal() {
 function updateTimer() {
     if (!gameState.startTime || !gameState.isTimerRunning) return;
     const elapsedTime = Date.now() -  gameState.startTime;
+    gameState.elapsedTime = elapsedTime;
     const minutes = Math.floor(elapsedTime / 60000);
     const seconds = Math.floor((elapsedTime % 60000) / 1000);
     document.getElementById("timer").innerText =
@@ -379,8 +428,8 @@ function placePlayer() {
 function collectCollectibles(cell) {
     cell.classList.remove("collectible");
     collectibles += 1;
-    collectiblesCollected += 1;
-    document.getElementById("collectibles").innerText = collectibles;
+    gameState.collectibles += 1;
+    document.getElementById("collectibles").innerText = gameState.collectibles;
     checkWinCondition();
 }
 
@@ -393,8 +442,8 @@ function collectKeys(cell) {
 
 function trapPlayer() {
     gameState.playerPosition = gameState.playerStart;
-    deaths += 1;
-    document.getElementById("deaths").innerText = deaths;
+    gameState.deaths += 1;
+    document.getElementById("deaths").innerText = gameState.deaths;
     placePlayer();
 }
 
@@ -590,6 +639,11 @@ maze.addEventListener("mousemove", (event) => {
 
 // ----- Level Stats Modal -----
 function showLevelStatsModal() {
+    const existingModal = document.getElementById("levelStatsModal");
+    if (existingModal) {
+        mazeContainer.removeChild(existingModal);
+    }
+
     gameState.isTimerRunning = false;
     const elapsedTime = Date.now() -  gameState.startTime;
     const minutes = Math.floor(elapsedTime / 60000);
@@ -604,7 +658,7 @@ function showLevelStatsModal() {
                 <p>Time Elapsed: ${minutes}m ${seconds}s</p>
                 <p>Collectibles: ${collectibles} / ${collectibleCount}</p>
                 <p>Keys Collected: ${keys} / ${keyCount}</p>
-                <p>Deaths: ${deaths}</p>
+                <p>Deaths: ${gameState.deaths}</p>
                 <br>
                 <button id="continueButton" style="padding: 10px 20px; font-size: 16px;"><i class="bi bi-play-circle-fill"></i> Continue</button>
             </div>
@@ -612,10 +666,8 @@ function showLevelStatsModal() {
     mazeContainer.insertAdjacentHTML("beforeend", levelStatsHTML);
 
     document.getElementById("continueButton").addEventListener("click", () => {
-        document.getElementById("levelStatsModal").remove();
-        document.getElementById("collectibles").innerText = 0;
+        mazeContainer.removeChild(document.getElementById("levelStatsModal"));
         document.getElementById("keys").innerText = 0;
-        document.getElementById("deaths").innerText = 0;
 
         saveGameState();
 
@@ -663,7 +715,7 @@ function endGame() {
         <div id="endModal" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;">
             <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
                 <h2>Game Completed!</h2>
-                <p>Total Time: ${minutes}m ${seconds}s<br>Collectibles: ${collectiblesCollected} / 25<br>Deaths: ${deaths}</p>
+                <p>Total Time: ${minutes}m ${seconds}s<br>Collectibles: ${gameState.collectibles} / 25<br>Deaths: ${gameState.deaths}</p>
                 <br>
                 <button id="restartButton"><i class="bi bi-arrow-clockwise"></i>Restart</button>
             </div>
@@ -671,7 +723,7 @@ function endGame() {
     mazeContainer.insertAdjacentHTML("beforeend", endModalHTML);
 
     document.getElementById("restartButton").addEventListener("click", () => {
-        document.getElementById("endModal").remove();
+        mazeContainer.removeChild(document.getElementById("endModal"));
         restartGame();
     });
 }
